@@ -1,0 +1,179 @@
+{
+  "name": "Proyecto Final - Alerta de errores",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f1a2b3c4-0000-4000-8000-000000000071",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1a2b3c4-0000-4000-8000-000000000072",
+              "name": "fecha",
+              "value": "={{ $now.toFormat('yyyy-MM-dd HH:mm') }}",
+              "type": "string"
+            },
+            {
+              "id": "f1a2b3c4-0000-4000-8000-000000000073",
+              "name": "workflow",
+              "value": "={{ $json.workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "f1a2b3c4-0000-4000-8000-000000000074",
+              "name": "nodo",
+              "value": "={{ $json.execution.lastNodeExecuted || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f1a2b3c4-0000-4000-8000-000000000075",
+              "name": "mensaje",
+              "value": "={{ $json.execution.error.message || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "f1a2b3c4-0000-4000-8000-000000000076",
+      "name": "Datos del error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Errores"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $json.fecha }}",
+            "workflow": "={{ $json.workflow }}",
+            "nodo": "={{ $json.nodo }}",
+            "mensaje": "={{ $json.mensaje }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nodo",
+              "displayName": "nodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "f1a2b3c4-0000-4000-8000-000000000077",
+      "name": "Registrar error (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Alerta de errores\nSe ejecuta sola cuando falla otro workflow. Para activarla: en el workflow principal, menú ⋯ → **Settings** → **Error workflow** → elige este.",
+        "height": 200,
+        "width": 560,
+        "color": 7
+      },
+      "id": "f1a2b3c4-0000-4000-8000-000000000078",
+      "name": "Nota 120",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -240
+      ]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Datos del error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datos del error": {
+      "main": [
+        [
+          {
+            "node": "Registrar error (Google Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

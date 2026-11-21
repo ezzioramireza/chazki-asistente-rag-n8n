@@ -1,0 +1,106 @@
+{
+  "name": "Proyecto Final - Simulador de WhatsApp",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f1a2b3c4-0000-4000-8000-000000000079",
+      "name": "Ejecutar prueba",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1a2b3c4-0000-4000-8000-00000000007a",
+              "name": "telefono",
+              "value": "51999000111",
+              "type": "string"
+            },
+            {
+              "id": "f1a2b3c4-0000-4000-8000-00000000007b",
+              "name": "nombre",
+              "value": "Carla Gomez",
+              "type": "string"
+            },
+            {
+              "id": "f1a2b3c4-0000-4000-8000-00000000007c",
+              "name": "tipo",
+              "value": "text",
+              "type": "string"
+            },
+            {
+              "id": "f1a2b3c4-0000-4000-8000-00000000007d",
+              "name": "mensaje",
+              "value": "Hola, quiero saber si Chazki puede hacer los envíos de mi tienda online.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "f1a2b3c4-0000-4000-8000-00000000007e",
+      "name": "Mensaje del cliente",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook-test/whatsapp-chazki-rag",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ object: 'whatsapp_business_account', entry: [{ id: '100000000000001', changes: [{ field: 'messages', value: { messaging_product: 'whatsapp', metadata: { display_phone_number: '51900000000', phone_number_id: '100000000000002' }, contacts: [{ profile: { name: $json.nombre }, wa_id: $json.telefono }], messages: [{ from: $json.telefono, id: 'wamid.TEST' + $now.toMillis(), timestamp: Math.floor($now.toSeconds()).toString(), type: $json.tipo, text: { body: $json.mensaje } }] } }] }] }) }}",
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "id": "f1a2b3c4-0000-4000-8000-00000000007f",
+      "name": "Enviar a n8n (simula WhatsApp)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Ejecutar prueba": {
+      "main": [
+        [
+          {
+            "node": "Mensaje del cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensaje del cliente": {
+      "main": [
+        [
+          {
+            "node": "Enviar a n8n (simula WhatsApp)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
